@@ -86,6 +86,10 @@ struct sduarg process_args(int argc, char* argv[]) {
         }
     }
 
+    if (args.path[0] == '\0') { // If no path specified, default to current path
+        strcpy(args.path, ".");
+    }
+
     return args;
 }
 
