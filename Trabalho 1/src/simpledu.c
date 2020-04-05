@@ -11,6 +11,6 @@ int main(int argc, char* argv[]) {
 
     print_args(args);
     printf("time: %f\n", elapsed_time());
-    
+    logExit(2);
     return 0;
 }
