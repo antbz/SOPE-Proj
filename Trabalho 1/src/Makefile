@@ -1,25 +1,15 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Werror -pedantic -Wno-unused-parameter
-TARGETS = $(patsubst %.c,%,$(wildcard *.c))
+OBJS = simpledu.o sduarg.o
+XHDRS = simpledu.h sduarg.h
+EXEC = simpledu
 
-define make_target
-$(1): $(1).o
-	$(CC) $(CFLAGS) $$^ -o $$@
-endef
+$(EXEC): $(OBJS)
+	@$(CC) $(CFLAGS) $(OBJS) -o $@
 
-.PHONY: all clean
-all: $(TARGETS)
+%.o: %.c %.h $(XHDRS)
+	@$(CC) $(CFLAGS) -c $<
 
-ifdef DEV_INFO
-DEV_FLAGS = -save-temps
-endif
-
-$(foreach TARGET,$(TARGETS),$(eval $(call make_target,$(TARGET))))
-
-%.o: %.c
-	$(CC) $(CFLAGS) $(DEV_FLAGS) -MMD -c $< -o $@
-
-clean:
-	rm -f $(TARGETS) *.o *.d *.i *.s
-
--include $(TARGETS:=.d)
+.PHONY : clean
+clean :
+	@-rm $(OBJS) $(EXEC)
