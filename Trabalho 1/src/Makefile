@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Werror -pedantic -Wno-unused-parameter
-OBJS = simpledu.o sduarg.o
-XHDRS = simpledu.h sduarg.h
+OBJS = simpledu.o sduarg.o exreg.o
+XHDRS = simpledu.h sduarg.h exreg.o
 EXEC = simpledu
 
 $(EXEC): $(OBJS)
@@ -12,4 +12,4 @@ $(EXEC): $(OBJS)
 
 .PHONY : clean
 clean :
-	@-rm $(OBJS) $(EXEC)
+	@-rm $(OBJS) $(EXEC) 
