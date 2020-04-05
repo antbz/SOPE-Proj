@@ -11,3 +11,5 @@
 #define DEFAULT_LOG "log.txt"
 
 int initReg();
+
+double elapsed_time();

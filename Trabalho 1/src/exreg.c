@@ -19,3 +19,8 @@ int initReg() {
 
     return 0;
 }
+
+double elapsed_time() {
+    clock_t current_time = clock();
+    return ((double) (current_time - start_time)) / CLOCKS_PER_SEC;
+}
