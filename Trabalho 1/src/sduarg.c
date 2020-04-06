@@ -79,6 +79,7 @@ struct sduarg process_args(int argc, char* argv[]) {
                 logExit(1);
             }
             strcpy(args.path, arg);
+            if (args.path[strlen(args.path) - 1] != '/') { strcat(args.path, "/"); }
         } else { // If argument is not option argument and path has already been defined, argument is not valid, throw error
             printf("Error invalid arguments! More than one path provided!\n\n");
             printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
@@ -87,7 +88,7 @@ struct sduarg process_args(int argc, char* argv[]) {
     }
 
     if (args.path[0] == '\0') { // If no path specified, default to current path
-        strcpy(args.path, ".");
+        strcpy(args.path, "./");
     }
 
     return args;

@@ -5,7 +5,7 @@
 #include <string.h>
 #include "exreg.h"
 
-#define MAX_PATH 512
+#define MAX_PATH 256
 
 /**
  * @brief struct holding values of argument options
