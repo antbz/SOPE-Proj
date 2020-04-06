@@ -33,6 +33,7 @@ void scan_dir(struct sduarg *args) {
             } else {
                 size = buf.st_blocks * 512 / args->Bsize;
             }
+            logEntry(size, path);
             printf("%d\t%s\n", size, path);
         }
     }

@@ -11,8 +11,13 @@
  * @brief struct holding values of argument options
 */
 struct sduarg {
-    int all, bytes, deref, sepdir, Bsize, max_depth;
-    char path[MAX_PATH];
+    int all; /**< Show file information, */
+    int bytes; /**< Show size in bytes. */
+    int deref; /**< Dereference symbolic links. */
+    int sepdir; /**< Do not include subdirectory size.*/
+    int Bsize; /**< Block size. */
+    int max_depth; /**< Maximum directory depth, */
+    char path[MAX_PATH]; /**< Path to directory. */
 };
 
 /**

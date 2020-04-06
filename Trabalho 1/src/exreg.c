@@ -53,3 +53,12 @@ void logCreate(int argc, char* argv[]) {
 
     printLog(instant, getpid(), "CREATE", args);
 }
+
+void logEntry(int size, char* path) {
+    double instant = elapsed_time();
+    char entry[MAX_LOG_LINE] = "";
+    
+    sprintf(entry, "%d %s", size, path);
+
+    printLog(instant, getpid(), "ENTRY", entry);
+}

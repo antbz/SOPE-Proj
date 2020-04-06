@@ -36,3 +36,8 @@ void logExit(int status);
  * @brief logs a process creation with specified arguments
 */
 void logCreate(int argc, char* argv[]);
+
+/**
+ * @brief logs a file that has been analysed
+*/
+void logEntry(int size, char* path);
