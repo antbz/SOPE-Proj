@@ -14,7 +14,7 @@ void initReg() {
 
     if (log_fd == -1) {
         perror("Failed to open/create log file");
-        exit(1);
+        exit(2);
     }
 }
 

@@ -3,6 +3,7 @@
 #include <string.h>
 #include "sduarg.h"
 #include "exreg.h"
+#include "scandir.h"
 
 int main(int argc, char* argv[]) {
     initReg();
@@ -12,7 +13,8 @@ int main(int argc, char* argv[]) {
     struct sduarg args = process_args(argc, argv);
 
     print_args(args);
-    printf("time: %f\n", elapsed_time());
+
+    scan_dir(&args);
     
     logExit(0);
 }
