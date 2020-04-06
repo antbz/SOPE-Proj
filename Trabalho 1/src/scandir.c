@@ -47,7 +47,7 @@ int scan_dir(struct sduarg args) {
             }
             cumulative += size;
             logEntry(size, path);
-            printf("%d\t%s\n", size, path);
+            if (args.all) { printf("%d\t%s\n", size, path); }
         } else if (S_ISDIR(buf.st_mode)) {           
             int fd[2];
 
