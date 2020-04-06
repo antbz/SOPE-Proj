@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 
     struct sduarg args = process_args(argc, argv);
 
-    print_args(args);
+    // print_args(args);
 
     scan_dir(&args);
     
