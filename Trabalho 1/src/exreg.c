@@ -41,3 +41,15 @@ void logExit(int status) {
     
     exit(status);
 }
+
+void logCreate(int argc, char* argv[]) {
+    double instant = elapsed_time();
+    char args[MAX_LOG_LINE] = "";
+    
+    for (int i = 0; i < argc; i++) {
+        strcat(args, argv[i]);
+        if (i != argc-1) { strcat(args, " "); }
+    }
+
+    printLog(instant, getpid(), "CREATE", args);
+}

@@ -19,7 +19,7 @@ struct sduarg process_args(int argc, char* argv[]) {
                     if (size < 1) { // Block size can never be less than 1. If argument following "-B" is not a valid number, atoi returns 0, so this also detects invalid input
                         printf("Error invalid arguments! size not provided or invalid.\n\n");
                         printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
-                        exit(1);
+                        logExit(1);
                     } else { // If block size is valid, set it
                         args.Bsize = size;
                     }
@@ -27,7 +27,7 @@ struct sduarg process_args(int argc, char* argv[]) {
                 else { // No other length 2 option arguments exist, so if it's not one of them, throw an error
                     printf("Error invalid arguments!\n\n");
                     printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
-                    exit(1);
+                    logExit(1);
                 }
             } else if (strlen(arg) > 2) { // If argument length is >2, it's a --[option] argument or a --[option]=N argument
                 if (strcmp(arg, "--all") == 0) { args.all = 1; }
@@ -42,7 +42,7 @@ struct sduarg process_args(int argc, char* argv[]) {
                     if (size < 1) { // If <1 or not a number, throw an error
                         printf("Error invalid arguments! size not provided or invalid.\n\n");
                         printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
-                        exit(1);
+                        logExit(1);
                     } else {
                         args.Bsize = size;
                     }
@@ -57,7 +57,7 @@ struct sduarg process_args(int argc, char* argv[]) {
                         if (max_depth < 1) { // If it's not 0, it can only be larger than 1 or it is invalid
                             printf("Error invalid arguments! max_depth not provided or invalid.\n\n");
                             printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
-                            exit(1);
+                            logExit(1);
                         } else {
                             args.max_depth = max_depth;
                         }
@@ -65,24 +65,24 @@ struct sduarg process_args(int argc, char* argv[]) {
                 } else { // If it is not one of the --[option] arguments, throw an error
                     printf("Error invalid arguments!\n\n");
                     printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
-                    exit(1);
+                    logExit(1);
                 }
             } else { // If the length of the argument is <2, throw an error
                 printf("Error invalid arguments!\n\n");
                 printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
-                exit(1);
+                logExit(1);
             }
         } else if (args.path[0] == '\0') { // If argument is not option argument and no path has yet been defined, define path
             if (strlen(arg) > MAX_PATH) {
                 printf("Error invalid arguments! Path too long!\n\n");
                 printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
-                exit(1);
+                logExit(1);
             }
             strcpy(args.path, arg);
         } else { // If argument is not option argument and path has already been defined, argument is not valid, throw error
             printf("Error invalid arguments! More than one path provided!\n\n");
             printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
-            exit(1);
+            logExit(1);
         }
     }
 

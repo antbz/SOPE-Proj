@@ -7,6 +7,8 @@
 int main(int argc, char* argv[]) {
     initReg();
 
+    logCreate(argc, argv);
+
     struct sduarg args = process_args(argc, argv);
 
     print_args(args);

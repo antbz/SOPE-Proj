@@ -19,3 +19,5 @@ double elapsed_time();
 void printLog(double instant, pid_t pid, char* action, char* info);
 
 void logExit(int status);
+
+void logCreate(int argc, char* argv[]);
