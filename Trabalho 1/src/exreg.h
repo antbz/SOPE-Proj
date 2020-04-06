@@ -9,6 +9,8 @@
 #include <fcntl.h>
 #include <string.h>
 
+#include "sduarg.h"
+
 #define DEFAULT_LOG "log.txt"
 #define MAX_LOG_LINE 512
 
@@ -36,6 +38,11 @@ void logExit(int status);
  * @brief logs a process creation with specified arguments
 */
 void logCreate(int argc, char* argv[]);
+
+/**
+ * @brief logs a process creation with specified arguments
+*/
+void logCreateFork(struct sduarg *args);
 
 /**
  * @brief logs a file that has been analysed

@@ -1,4 +1,5 @@
 #include "sduarg.h"
+#include "exreg.h"
 
 struct sduarg process_args(int argc, char* argv[]) {
     struct sduarg args = {0, 0, 0, 0, 1024, -1, ""}; // Default values for variables
