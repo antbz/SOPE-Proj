@@ -11,4 +11,7 @@
 #include "sduarg.h"
 #include "exreg.h"
 
+/**
+ * @brief scans dir contents and prints information as specified in args
+*/
 void scan_dir(struct sduarg *args);

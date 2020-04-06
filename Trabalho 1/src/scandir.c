@@ -19,6 +19,14 @@ void scan_dir(struct sduarg *args) {
             logExit(4);
         }
 
-        printf("%s - %d\n", path, S_ISDIR(buf.st_mode));
+        if (S_ISREG(buf.st_mode)) {
+            int size;
+            if (args->bytes) {
+                size = buf.st_size;
+            } else {
+                size = buf.st_blocks * 512 / args->Bsize;
+            }
+            printf("%d\t%s\n", size, path);
+        }
     }
 }
