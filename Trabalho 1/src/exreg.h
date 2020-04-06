@@ -12,12 +12,27 @@
 #define DEFAULT_LOG "log.txt"
 #define MAX_LOG_LINE 512
 
-int initReg();
+/**
+ * @brief opens log file in LOG_FILENAME (or DEFAULT_LOG if not defined)
+*/
+void initReg();
 
+/**
+ * @brief returns double with elapsed CPU time in ms since start of program
+*/
 double elapsed_time();
 
+/**
+ * @brief prints a log line to opened log file
+*/
 void printLog(double instant, pid_t pid, char* action, char* info);
 
+/**
+ * @brief logs an exit with specified status
+*/
 void logExit(int status);
 
+/**
+ * @brief logs a process creation with specified arguments
+*/
 void logCreate(int argc, char* argv[]);

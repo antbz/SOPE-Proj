@@ -1,7 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Werror -pedantic -Wno-unused-parameter
-OBJS = simpledu.o sduarg.o exreg.o
-XHDRS = simpledu.h sduarg.h exreg.o
+OBJS = simpledu.o sduarg.o exreg.o scandir.o
 EXEC = simpledu
 
 $(EXEC): $(OBJS)

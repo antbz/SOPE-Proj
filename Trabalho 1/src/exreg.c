@@ -3,21 +3,19 @@
 clock_t start_time;
 int log_fd;
 
-int initReg() {
-    start_time = clock();
+void initReg() {
+    start_time = clock(); // Store start time
     
     char* log_path = getenv("LOG_FILENAME");
 
-    if (log_path == NULL) { log_path = DEFAULT_LOG; }
+    if (log_path == NULL) { log_path = DEFAULT_LOG; } // If no env. var was defined, use default value
     
-    log_fd = open(log_path, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+    log_fd = open(log_path, O_WRONLY | O_TRUNC | O_CREAT, 0644); // Open file for writing, discard previous content and create with rw-r--r-- permissions
 
     if (log_fd == -1) {
         perror("Failed to open/create log file");
-        return 1;
+        exit(1);
     }
-
-    return 0;
 }
 
 double elapsed_time() {
@@ -38,6 +36,8 @@ void logExit(int status) {
     sprintf(stat, "%d", status);
 
     printLog(instant, getpid(), "EXIT", stat);
+
+    close(log_fd);
     
     exit(status);
 }
