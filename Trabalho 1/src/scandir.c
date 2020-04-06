@@ -6,7 +6,7 @@ int scan_dir(struct sduarg args) {
     struct stat buf;
     int cumulative = 0;
 
-    args.max_depth--;
+    if (args.max_depth >= -1) { args.max_depth--; }
 
     if ((dir = opendir(args.path)) == NULL) {
         perror(args.path);
@@ -49,7 +49,7 @@ int scan_dir(struct sduarg args) {
             }
             cumulative += size;
             logEntry(size, path);
-            if (args.all && args.max_depth>=-1) { printf("%d\t%s\n", size, path); }
+            if (args.all && (args.max_depth >= -1 || args.max_depth == -3)) { printf("%d\t%s\n", size, path); }
         } else if (S_ISDIR(buf.st_mode)) {           
             int fd[2];
 
@@ -68,10 +68,14 @@ int scan_dir(struct sduarg args) {
                 
                 wait(NULL);
                 
-                int b;
-                read(fd[READ], &b, sizeof(int));
-                
-                cumulative += b;
+                if (!args.sepdir) {
+                    int b;
+                    read(fd[READ], &b, sizeof(int));
+                    char message[MAX_LOG_LINE];
+                    sprintf(message, "%d", b);
+                    logRecievePipe(message);
+                    cumulative += b;
+                }
             } else { // CHILD
                 close(fd[READ]);
                 
@@ -79,14 +83,21 @@ int scan_dir(struct sduarg args) {
                 strcat(args.path, "/");
                 
                 logCreateFork(&args);
+
                 int s = scan_dir(args);
-                write(fd[WRITE], &s, sizeof(s));
+                if (!args.sepdir) {
+                    char message[MAX_LOG_LINE];
+                    sprintf(message, "%d", s);
+                    logSendPipe(message);
+                    write(fd[WRITE], &s, sizeof(s));
+                }
                 
                 logExit(0);
             }
         }
     }
+
     args.path[strlen(args.path)-1] = 0;
-    if(args.max_depth>=-1){printf("%d\t%s\n", cumulative, args.path);}
+    if(args.max_depth >= -1 || args.max_depth == -3){printf("%d\t%s\n", cumulative, args.path);}
     return cumulative;
 }

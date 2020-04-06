@@ -48,3 +48,13 @@ void logCreateFork(struct sduarg *args);
  * @brief logs a file that has been analysed
 */
 void logEntry(int size, char* path);
+
+/**
+ * @brief logs a message recieved through pipe
+*/
+void logRecievePipe(char* message);
+
+/**
+ * @brief logs a message sent through pipe
+*/
+void logSendPipe(char* message);

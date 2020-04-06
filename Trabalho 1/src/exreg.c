@@ -69,7 +69,7 @@ void logCreateFork(struct sduarg *args){
     if(args->deref == 1){strcat(output," -L");}
     if(args->sepdir == 1){strcat(output," -S");}
 
-    if(args->max_depth!=-1){
+    if(args->max_depth!=-2){
         char number[28];
         sprintf(number, " --max_depth=%d", args->max_depth);
         strcat(output,number);
@@ -85,4 +85,16 @@ void logEntry(int size, char* path) {
     sprintf(entry, "%d %s", size, path);
 
     printLog(instant, getpid(), "ENTRY", entry);
+}
+
+void logRecievePipe(char* message) {
+    double instant = elapsed_time();
+    
+    printLog(instant, getpid(), "RECV_PIPE", message);
+}
+
+void logSendPipe(char* message) {
+    double instant = elapsed_time();
+    
+    printLog(instant, getpid(), "SEND_PIPE", message);
 }
