@@ -6,6 +6,8 @@ int scan_dir(struct sduarg args) {
     struct stat buf;
     int cumulative = 0;
 
+    args.max_depth--;
+
     if ((dir = opendir(args.path)) == NULL) {
         perror(args.path);
         logExit(3);
@@ -47,7 +49,7 @@ int scan_dir(struct sduarg args) {
             }
             cumulative += size;
             logEntry(size, path);
-            if (args.all) { printf("%d\t%s\n", size, path); }
+            if (args.all && args.max_depth>=-1) { printf("%d\t%s\n", size, path); }
         } else if (S_ISDIR(buf.st_mode)) {           
             int fd[2];
 
@@ -77,7 +79,6 @@ int scan_dir(struct sduarg args) {
                 strcat(args.path, "/");
                 
                 logCreateFork(&args);
-                
                 int s = scan_dir(args);
                 write(fd[WRITE], &s, sizeof(s));
                 
@@ -85,7 +86,7 @@ int scan_dir(struct sduarg args) {
             }
         }
     }
-
-    printf("%d\t%s\n", cumulative, args.path);
+    args.path[strlen(args.path)-1] = 0;
+    if(args.max_depth>=-1){printf("%d\t%s\n", cumulative, args.path);}
     return cumulative;
 }
