@@ -54,6 +54,30 @@ void logCreate(int argc, char* argv[]) {
     printLog(instant, getpid(), "CREATE", args);
 }
 
+void logCreateFork(struct sduarg *args){
+    double instant = elapsed_time();
+    char output[MAX_LOG_LINE] = "";
+    strcpy(output,"-l ");
+    strcat(output,args->path);
+    if(args->all == 1){strcat(output," -a");}
+    if(args->bytes == 1){strcat(output," -b");}
+    else if(args->Bsize!=1024){
+        char number[12];
+        sprintf(number, " -B %d", args->Bsize);
+        strcat(output,number);
+    }
+    if(args->deref == 1){strcat(output," -L");}
+    if(args->sepdir == 1){strcat(output," -S");}
+
+    if(args->max_depth!=-1){
+        char number[28];
+        sprintf(number, " --max_depth=%d", args->max_depth);
+        strcat(output,number);
+    }
+
+    printLog(instant, getpid(), "CREATE", output);
+}
+
 void logEntry(int size, char* path) {
     double instant = elapsed_time();
     char entry[MAX_LOG_LINE] = "";

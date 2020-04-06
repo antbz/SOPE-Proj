@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
 
     struct sduarg args = process_args(argc, argv);
 
+    logCreateFork(&args);
+
     scan_dir(&args);
     
     logExit(0);
