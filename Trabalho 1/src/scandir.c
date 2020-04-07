@@ -99,5 +99,6 @@ int scan_dir(struct sduarg args) {
 
     args.path[strlen(args.path)-1] = 0;
     if(args.max_depth >= -1 || args.max_depth == -3){printf("%d\t%s\n", cumulative, args.path);}
+    
     return cumulative;
 }

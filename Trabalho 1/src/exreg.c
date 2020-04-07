@@ -1,10 +1,10 @@
 #include "exreg.h"
 
-clock_t start_time;
+struct timespec start_time;
 int log_fd;
 
 void initReg() {
-    start_time = clock(); // Store start time
+    clock_gettime(CLOCK_MONOTONIC, &start_time); // Store start time
     
     char* log_path = getenv("LOG_FILENAME");
 
@@ -19,8 +19,13 @@ void initReg() {
 }
 
 double elapsed_time() {
-    clock_t current_time = clock();
-    return ((double) (current_time - start_time)) / (CLOCKS_PER_SEC / (double) 1000);
+    struct timespec current_time;
+    clock_gettime(CLOCK_MONOTONIC, &current_time);
+
+    double elapsed = (current_time.tv_sec - start_time.tv_sec) * 1e9;
+    elapsed = (elapsed + (current_time.tv_nsec - start_time.tv_nsec)) * 1e-6;
+
+    return elapsed;
 }
 
 void printLog(double instant, pid_t pid, char* action, char* info) {
