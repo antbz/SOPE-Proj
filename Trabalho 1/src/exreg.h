@@ -58,3 +58,13 @@ void logRecievePipe(char* message);
  * @brief logs a message sent through pipe
 */
 void logSendPipe(char* message);
+
+/**
+ * @brief logs a recieved signal
+*/
+void logRecieveSig(char* sig);
+
+/**
+ * @brief logs a signal sent to specified process
+*/
+void logSendSig(char* sig, int pid);

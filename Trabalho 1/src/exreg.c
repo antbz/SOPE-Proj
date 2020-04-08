@@ -103,3 +103,17 @@ void logSendPipe(char* message) {
     
     printLog(instant, getpid(), "SEND_PIPE", message);
 }
+
+void logRecieveSig(char* sig) {
+    double instant = elapsed_time();
+    
+    printLog(instant, getpid(), "RECV_SIGNAL", sig);
+}
+
+void logSendSig(char* sig, int pid) {
+    double instant = elapsed_time();
+    char* line[MAX_LOG_LINE] = "";
+    sprintf(line, "%s %d", sig, pid);
+    
+    printLog(instant, getpid(), "SEND_PIPE", line);
+}
