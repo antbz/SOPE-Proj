@@ -115,5 +115,5 @@ void logSendSig(char* sig, int pid) {
     char line[MAX_LOG_LINE] = "";
     sprintf(line, "%s %d", sig, pid);
     
-    printLog(instant, getpid(), "SEND_PIPE", line);
+    printLog(instant, getpid(), "SEND_SIGNAL", line);
 }
