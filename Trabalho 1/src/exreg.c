@@ -112,7 +112,7 @@ void logRecieveSig(char* sig) {
 
 void logSendSig(char* sig, int pid) {
     double instant = elapsed_time();
-    char* line[MAX_LOG_LINE] = "";
+    char line[MAX_LOG_LINE] = "";
     sprintf(line, "%s %d", sig, pid);
     
     printLog(instant, getpid(), "SEND_PIPE", line);
