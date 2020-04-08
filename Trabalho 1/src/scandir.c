@@ -1,5 +1,8 @@
 #include "scandir.h"
 
+pid_t child = 0;
+pid_t main_prg;
+
 int scan_dir(struct sduarg args) {
     DIR* dir;
     struct dirent* dirent;
@@ -49,7 +52,11 @@ int scan_dir(struct sduarg args) {
             }
             cumulative += size;
             logEntry(size, path);
-            if (args.all && (args.max_depth >= -1 || args.max_depth == -3)) { printf("%d\t%s\n", size, path); }
+            if (args.all && (args.max_depth >= -1 || args.max_depth == -3)) { 
+                char entry[MAX_LOG_LINE];
+                sprintf(entry, "%d\t%s\n", size, path);
+                write(STDOUT_FILENO, entry, strlen(entry));
+            }
         } else if (S_ISDIR(buf.st_mode)) {           
             int fd[2];
 
@@ -66,6 +73,8 @@ int scan_dir(struct sduarg args) {
             } else if (pid > 0) { // PARENT
                 close(fd[WRITE]);
                 
+                if (getpgrp() == main_prg) { child = pid; }
+
                 wait(NULL);
                 
                 if (!args.sepdir) {
@@ -77,6 +86,13 @@ int scan_dir(struct sduarg args) {
                     cumulative += b;
                 }
             } else { // CHILD
+                if (getpgrp() == main_prg) {
+                    setpgid(pid, getpid());
+                }
+                signal(SIGTSTP, sdu_sigtstp_handler);
+                signal(SIGCONT, sdu_sigcont_handler);
+                signal(SIGTERM, sdu_sigterm_handler);
+                
                 close(fd[READ]);
                 
                 strcpy(args.path, path);
@@ -96,9 +112,16 @@ int scan_dir(struct sduarg args) {
             }
         }
     }
+    
+    child = 0;
 
     args.path[strlen(args.path)-1] = 0;
-    if(args.max_depth >= -1 || args.max_depth == -3){printf("%d\t%s\n", cumulative, args.path);}
+    logEntry(cumulative, args.path);
+    if(args.max_depth >= -1 || args.max_depth == -3){ 
+        char entry[MAX_LOG_LINE];
+        sprintf(entry, "%d\t%s\n", cumulative, args.path);
+        write(STDOUT_FILENO, entry, strlen(entry));
+    }
     
     return cumulative;
 }

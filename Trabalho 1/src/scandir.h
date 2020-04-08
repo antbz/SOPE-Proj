@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include "sduarg.h"
 #include "exreg.h"
+#include "sighandler.h"
 
 #define READ 0
 #define WRITE 1

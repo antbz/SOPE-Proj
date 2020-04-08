@@ -2,3 +2,4 @@
 **/*.d
 **/simpledu
 **/log.txt
+.vscode/
