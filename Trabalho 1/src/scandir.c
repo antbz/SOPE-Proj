@@ -52,7 +52,8 @@ int scan_dir(struct sduarg args) {
             logEntry(size, path);
             if (args.all && args.max_depth > 0) { 
                 char entry[MAX_LOG_LINE];
-                if (args.bytes) { sprintf(entry, "%d\t%s\n", size, path); }
+                if (args.bytes && !args.blocks) { sprintf(entry, "%d\t%s\n", size, path); }
+                else if (args.bytes && args.blocks) { sprintf(entry, "%d\t%s\n", (int) ceil(size / (double) args.Bsize), path); }
                 else { sprintf(entry, "%d\t%s\n", (int) ceil(size / ((double) args.Bsize / 1024.0)), path); }
                 write(STDOUT_FILENO, entry, strlen(entry));
             }
@@ -119,7 +120,8 @@ int scan_dir(struct sduarg args) {
     logEntry(cumulative, args.path);
     if(args.max_depth >= 0){ 
         char entry[MAX_LOG_LINE];
-        if (args.bytes) { sprintf(entry, "%d\t%s\n", cumulative, args.path); }
+        if (args.bytes && !args.blocks) { sprintf(entry, "%d\t%s\n", cumulative, args.path); }
+        else if (args.bytes && args.blocks) { sprintf(entry, "%d\t%s\n", (int) ceil(cumulative / (double) args.Bsize), args.path); }
         else { sprintf(entry, "%d\t%s\n", (int) ceil(cumulative / ((double) args.Bsize / 1024.0)), args.path); }
         write(STDOUT_FILENO, entry, strlen(entry));
     }

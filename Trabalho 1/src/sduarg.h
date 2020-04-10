@@ -15,6 +15,7 @@ struct sduarg {
     int deref; /**< Dereference symbolic links. */
     int sepdir; /**< Do not include subdirectory size.*/
     int Bsize; /**< Block size. */
+    int blocks; /**< Show size in blocks. */
     int max_depth; /**< Maximum directory depth, */
     char path[MAX_PATH]; /**< Path to directory. */
 };

@@ -2,7 +2,7 @@
 #include "exreg.h"
 
 struct sduarg process_args(int argc, char* argv[]) {
-    struct sduarg args = {0, 0, 0, 0, 1024, __INT_MAX__, ""}; // Default values for variables
+    struct sduarg args = {0, 0, 0, 0, 1024, 0, __INT_MAX__, ""}; // Default values for variables
     
     for (int i = 1; i < argc; i++) { // Go through all arguments, ignoring the 1st (program name)
         char* arg = argv[i]; // Store argument for use later
@@ -10,7 +10,7 @@ struct sduarg process_args(int argc, char* argv[]) {
         if (arg[0] == '-') { // Analyse arguments starting with '-' (option arguments)
             if (strlen(arg) == 2) { // If argument length is 2, it's an -[opt] option argument
                 if (strcmp(arg, "-a") == 0) { args.all = 1; }
-                else if (strcmp(arg, "-b") == 0) { args.bytes = 1; }
+                else if (strcmp(arg, "-b") == 0) { args.bytes = 1; if (args.blocks) { args.blocks = 0; } }
                 else if (strcmp(arg, "-L") == 0) { args.deref = 1; }
                 else if (strcmp(arg, "-S") == 0) { args.sepdir = 1; }
                 else if (strcmp(arg, "-l") == 0) { continue; } // "-l" is always on, so no variable needs to be set. Still, it's a valid argument
@@ -23,6 +23,7 @@ struct sduarg process_args(int argc, char* argv[]) {
                         logExit(1);
                     } else { // If block size is valid, set it
                         args.Bsize = size;
+                        args.blocks = 1;
                     }
                 }
                 else { // No other length 2 option arguments exist, so if it's not one of them, throw an error
@@ -32,7 +33,7 @@ struct sduarg process_args(int argc, char* argv[]) {
                 }
             } else if (strlen(arg) > 2) { // If argument length is >2, it's a --[option] argument or a --[option]=N argument
                 if (strcmp(arg, "--all") == 0) { args.all = 1; }
-                else if (strcmp(arg, "--bytes") == 0) { args.bytes = 1; }
+                else if (strcmp(arg, "--bytes") == 0) { args.bytes = 1; if (args.blocks) { args.blocks = 0; } }
                 else if (strcmp(arg, "--dereference") == 0) { args.deref = 1; }
                 else if (strcmp(arg, "--separate-dirs") == 0) { args.sepdir = 1; }
                 else if (strcmp(arg, "--count-links") == 0) { continue; }
@@ -101,6 +102,7 @@ void print_args(struct sduarg args) {
     printf("deref: %d\n", args.deref);
     printf("sepdir: %d\n", args.sepdir);
     printf("Bsize: %d\n", args.Bsize);
+    printf("blocks: %d\n", args.blocks);
     printf("max-depth: %d\n", args.max_depth);
     printf("path: %s\n", args.path);
 }
