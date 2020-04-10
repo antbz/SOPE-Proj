@@ -4,7 +4,7 @@ OBJS = simpledu.o sduarg.o exreg.o scandir.o sighandler.o
 EXEC = simpledu
 
 $(EXEC): $(OBJS)
-	@$(CC) $(CFLAGS) $(OBJS) -o $@
+	@$(CC) $(CFLAGS) $(OBJS) -lm -o $@
 
 %.o: %.c %.h $(XHDRS)
 	@$(CC) $(CFLAGS) -c $<

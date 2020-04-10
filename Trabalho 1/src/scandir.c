@@ -9,8 +9,6 @@ int scan_dir(struct sduarg args) {
     struct stat buf;
     int cumulative = 0;
 
-    if (args.max_depth >= -1) { args.max_depth--; }
-
     if ((dir = opendir(args.path)) == NULL) {
         perror(args.path);
         logExit(3);
@@ -27,7 +25,7 @@ int scan_dir(struct sduarg args) {
             if (args.bytes) {
                 cumulative += buf.st_size;
             } else {
-                cumulative += buf.st_blocks * 512 / args.Bsize;
+                cumulative += buf.st_blocks / 2;
             }
             continue;
         }
@@ -48,13 +46,14 @@ int scan_dir(struct sduarg args) {
             if (args.bytes) {
                 size = buf.st_size;
             } else {
-                size = buf.st_blocks * 512 / args.Bsize;
+                size = buf.st_blocks / 2;
             }
             cumulative += size;
             logEntry(size, path);
-            if (args.all && (args.max_depth >= -1 || args.max_depth == -3)) { 
+            if (args.all && args.max_depth > 0) { 
                 char entry[MAX_LOG_LINE];
-                sprintf(entry, "%d\t%s\n", size, path);
+                if (args.bytes) { sprintf(entry, "%d\t%s\n", size, path); }
+                else { sprintf(entry, "%d\t%s\n", (int) ceil(size / ((double) args.Bsize / 1024.0)), path); }
                 write(STDOUT_FILENO, entry, strlen(entry));
             }
         } else if (S_ISDIR(buf.st_mode)) {           
@@ -97,6 +96,8 @@ int scan_dir(struct sduarg args) {
                 strcpy(args.path, path);
                 strcat(args.path, "/");
                 
+                if (args.max_depth != __INT_MAX__) { args.max_depth--; }
+
                 logCreateFork(&args);
 
                 int s = scan_dir(args);
@@ -116,9 +117,10 @@ int scan_dir(struct sduarg args) {
 
     args.path[strlen(args.path)-1] = 0;
     logEntry(cumulative, args.path);
-    if(args.max_depth >= -1 || args.max_depth == -3){ 
+    if(args.max_depth >= 0){ 
         char entry[MAX_LOG_LINE];
-        sprintf(entry, "%d\t%s\n", cumulative, args.path);
+        if (args.bytes) { sprintf(entry, "%d\t%s\n", cumulative, args.path); }
+        else { sprintf(entry, "%d\t%s\n", (int) ceil(cumulative / ((double) args.Bsize / 1024.0)), args.path); }
         write(STDOUT_FILENO, entry, strlen(entry));
     }
     
