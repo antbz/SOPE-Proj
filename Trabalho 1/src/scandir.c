@@ -89,7 +89,6 @@ int scan_dir(struct sduarg args) {
                 if (getpgrp() == main_prg) {
                     setpgid(pid, getpid());
                 }
-                signal(SIGTSTP, sdu_sigtstp_handler);
                 signal(SIGCONT, sdu_sigcont_handler);
                 signal(SIGTERM, sdu_sigterm_handler);
                 

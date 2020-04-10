@@ -6,8 +6,8 @@ void sdu_sigint_handler(int sig) {
     logRecieveSig("SIGINT");
 
     if (child) {
-        kill(-child, SIGTSTP);
-        logSendSig("SIGTSTP", -child);
+        kill(-child, SIGSTOP);
+        logSendSig("SIGSTOP", -child);
     }
     char opt;
     
@@ -22,16 +22,13 @@ void sdu_sigint_handler(int sig) {
             logSendSig("SIGCONT", -child);
             break;
         } else if (opt == 'Y' || opt == 'y') {
+            kill(-child, SIGCONT);
             kill(-child, SIGTERM);
+            logSendSig("SIGCONT", -child);
             logSendSig("SIGTERM", -child);
             logExit(10);
         }
     }
-}
-
-void sdu_sigtstp_handler(int sig) {
-    logRecieveSig("SIGTSTP");
-    pause();
 }
 
 void sdu_sigcont_handler(int sig) {

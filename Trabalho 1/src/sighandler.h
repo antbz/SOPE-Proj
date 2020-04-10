@@ -12,11 +12,6 @@
 void sdu_sigint_handler(int sig);
 
 /**
- * @brief SIGTSTP handler for child process
-*/
-void sdu_sigtstp_handler(int sig);
-
-/**
  * @brief SIGCONT handler for child process
 */
 void sdu_sigcont_handler(int sig);
