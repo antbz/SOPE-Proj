@@ -2,7 +2,7 @@
 #include "exreg.h"
 
 struct sduarg process_args(int argc, char* argv[]) {
-    struct sduarg args = {0, 0, 0, 0, 1024, -3, ""}; // Default values for variables
+    struct sduarg args = {0, 0, 0, 0, 1024, __INT_MAX__, ""}; // Default values for variables
     
     for (int i = 1; i < argc; i++) { // Go through all arguments, ignoring the 1st (program name)
         char* arg = argv[i]; // Store argument for use later

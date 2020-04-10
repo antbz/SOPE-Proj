@@ -9,6 +9,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <sys/wait.h>
+#include <math.h>
 #include "sduarg.h"
 #include "exreg.h"
 #include "sighandler.h"
