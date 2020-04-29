@@ -66,7 +66,7 @@ void logCreateFork(struct sduarg *args){
     strcat(output,args->path);
     if(args->all == 1){strcat(output," -a");}
     if(args->bytes == 1){strcat(output," -b");}
-    if(args->blocks){
+    else if(args->Bsize!=1024){
         char number[12];
         sprintf(number, " -B %d", args->Bsize);
         strcat(output,number);
