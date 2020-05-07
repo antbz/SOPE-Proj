@@ -28,6 +28,6 @@ int read_msg(int fifo_fd, char* msg, char delim) {
         msg[i] = c;
         i++;
     }
-    msg[i] = '\0';
+    msg[i] = '\0'; // Terminate the string appropriately
     return strlen(msg);
 }
