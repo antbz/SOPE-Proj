@@ -6,6 +6,8 @@
 
 #include "../common/utils.h"
 
+#define DEFAULT_MAX_THREAD 300
+
 /**
  * @brief struct for holding server program arguments
 */

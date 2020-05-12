@@ -2,7 +2,7 @@
 
 
 struct Qarg processArgs(int argc, char* argv[]){
-    struct Qarg args = {0, "", 0, 0};
+    struct Qarg args = {0, "", 0, DEFAULT_MAX_THREAD};
 
     if (argc < 4 || argc > 8) { // The number of arguments is at least 4 at maximum 8 (program_name, -t, nsecs, fifoname, [-l], [nplaces], [-n], [nthreads])
         printf("Error! Invalid arguments.\nUsage: %s <-t nsecs> [-l nplaces] [-n nsecs] fifoname\n", argv[0]);
@@ -17,7 +17,7 @@ struct Qarg processArgs(int argc, char* argv[]){
                 i++;
                 int nsecs = atoi(argv[i]); 
                 if (nsecs < 1) { // must always be a positive value
-                    printf("Error! Invalid arguments. nsecs parameter must be positive.\nUsage: %s <-t nsecs> [-l nplaces] [-n nsecs] fifoname\n", argv[0]);
+                    printf("Error! Invalid arguments. nsecs parameter must be a positive number.\nUsage: %s <-t nsecs> [-l nplaces] [-n nsecs] fifoname\n", argv[0]);
                     exit(1);
                 } else {
                     args.numberSeconds = nsecs;
@@ -26,7 +26,7 @@ struct Qarg processArgs(int argc, char* argv[]){
                 i++;
                 int nplaces = atoi(argv[i]); 
                 if (nplaces < 1) { // must always be a positive value
-                    printf("Error! Invalid arguments. nplaces parameter must be positive.\nUsage: %s <-t nsecs> [-l nplaces] [-n nsecs] fifoname\n", argv[0]);
+                    printf("Error! Invalid arguments. nplaces parameter must be a positive number.\nUsage: %s <-t nsecs> [-l nplaces] [-n nsecs] fifoname\n", argv[0]);
                     exit(1);
                 } else {
                     args.nplaces = nplaces;
@@ -34,8 +34,8 @@ struct Qarg processArgs(int argc, char* argv[]){
             } else if (strcmp(arg, "-n") == 0) { // -n option - nthreads
                 i++;
                 int nthreads = atoi(argv[i]); 
-                if (nthreads < 1) { // must always be a positive value
-                    printf("Error! Invalid arguments. nthreads parameter must be positive.\nUsage: %s <-t nsecs> [-l nplaces] [-n nsecs] fifoname\n", argv[0]);
+                if (nthreads < 0) { // must always be a non-negative value
+                    printf("Error! Invalid arguments. nthreads parameter must be a non-negative number.\nUsage: %s <-t nsecs> [-l nplaces] [-n nsecs] fifoname\n", argv[0]);
                     exit(1);
                 } else {
                     args.nthreads = nthreads;
