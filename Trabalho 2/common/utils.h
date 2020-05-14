@@ -55,15 +55,3 @@ void setStart();
  * @brief calculates elapsed time between saved start time and curent time
 */
 double elapsedTime();
-
-/**
- * @brief reads a message from specified file descriptor to given buffer, until a
- * specific character is read
- * 
- * @param fifo_fd file descriptor
- * @param msg pointer to buffer
- * @param delim separating character
- * 
- * @return number of characters read from fifo_fd
-*/
-int read_msg(int fifo_fd, char* msg, char delim);

@@ -29,7 +29,6 @@ void* requestSender(void* arg) {
     if ((fifo_fd = open(c_msg.fifoname, O_WRONLY | O_NONBLOCK)) < 0) {
         // If an error occurs report a failure and assume the server is closed
         perror("Cannot open server FIFO for WRITING");
-        printLog(c_msg.i, getpid(), pthread_self(), dur, -1, FAILED);
         closed = 1;
         return NULL;
     }
@@ -38,18 +37,14 @@ void* requestSender(void* arg) {
     char fifoname[MAX_FIFONAME];
     sprintf(fifoname, "/tmp/%d.%ld", getpid(), pthread_self());
     if (mkfifo(fifoname, 0660) == -1) {
-        // If an error occurs report a failure
         perror("Error creating private FIFO");
-        printLog(c_msg.i, getpid(), pthread_self(), dur, -1, FAILED);
         return NULL;
     }
 
     // Sends request message to server public fifo
-    char msg[MAX_MSG];
-    sprintf(msg, "[ %d, %d, %ld, %d, %d ]\n", c_msg.i, getpid(), pthread_self(), dur, -1);
-    if (write(fifo_fd, &msg, strlen(msg)) < 0) {
-        // If an error ocurrs report a failure, delete the private fifo and assume the server is closed
-        printLog(c_msg.i, getpid(), pthread_self(), dur, -1, FAILED);
+    struct fifo_msg msg = {c_msg.i, getpid(), pthread_self(), dur, -1};
+    if (write(fifo_fd, &msg, sizeof(msg)) < 0) {
+        // If an error ocurrs delete the private fifo and assume the server is closed
         if (unlink(fifoname) < 0) {
             perror("Cannot delete private FIFO");
         }
@@ -74,9 +69,9 @@ void* requestSender(void* arg) {
     }
 
     // Read server response
-    char server_response[MAX_MSG];
+    struct fifo_msg s_msg;
     int tries = 0;
-    while (read(priv_fd, server_response, MAX_MSG) <= 0 && tries < 5) {
+    while (read(priv_fd, &s_msg, sizeof(s_msg)) <= 0 && tries < 5) {
         // If an error occurs, try again after a few instants to account for possible server delay
         usleep(300);
         tries++;
@@ -91,10 +86,6 @@ void* requestSender(void* arg) {
         }
         return NULL;
     }
-
-    // Parse server response into struct
-    struct fifo_msg s_msg;
-    sscanf(server_response, "[ %d, %d, %lu, %d, %d ]", &s_msg.i, &s_msg.pid, &s_msg.tid, &s_msg.dur, &s_msg.pl);
 
     // Determine if request was successful or not based on response content
     if (s_msg.dur == -1 && s_msg.pl == -1) {
@@ -115,10 +106,22 @@ void* requestSender(void* arg) {
 
 int main(int argc, char* argv[]) {
     setStart();
-
     struct Uarg args = processArgs(argc,argv); // Process console arguments
 
     int i = 0; // Initializes request id
+
+    // Make sure that public FIFO is currently available and opened for reading
+    int fd;
+    do {
+        fd = open(args.fifoname, O_WRONLY);
+        if (elapsedTime() >= args.numberSeconds) {
+            perror("Timed out trying to open server FIFO");
+            exit(1);
+        }
+        if (fd == -1) { sleep(1); }
+    } while (fd == -1);
+
+    close(fd); // fd does not need to be preserved, close it
 
     // Request-generating loop, stops when server is closed or runtime has passed
     while (elapsedTime() < args.numberSeconds && !closed) {
@@ -129,7 +132,7 @@ int main(int argc, char* argv[]) {
         pthread_create(&t, NULL, requestSender, &c_msg);
         
         i++; // Increments request id
-        usleep(50e3); // Waits 50ms before generating next request
+        usleep(50000); // Waits 50ms before generating next request
     }
 
     pthread_exit(0);

@@ -8,8 +8,7 @@ tal qual especificado no enunciado do projeto.
 
 **U2:** ` ./U2 <-t nsecs> fifoname `
 
-Deve ser executado o programa servidor em primeiro lugar, caso contrário, o programa
-cliente reportará um erro e não executará.
+Os programas podem ser executados por qualquer ordem.
 
 ## Detalhes de implementação
 
@@ -41,8 +40,7 @@ registo por parte dos programas na *stdout*.
 - **IWANT** - Cliente faz pedido inicial, escrevendo com sucesso a mensagem no fifo público
 - **IAMIN** - Cliente acusa que recebeu resposta positiva do servidor
 - **CLOSD** - Cliente acusa que recebeu resposta do servidor indicando que o quarto de banho está encerrado.
-- **FAILD** - Cliente reporta que não foi possível establecer comunicação com o fifo público do servidor
-ou que este demorou demasiado tempo a dar resposta no fifo privado.
+- **FAILD** - Cliente reporta que não foi possível obter resposta do servidor.
 
 ### Servidor - Q2
 - **RECVD** - Servidor acusa receção do pedido.

@@ -16,5 +16,6 @@ U2: $(UOBJ) $(COBJ)
 Q2: $(QOBJ) $(COBJ)
 	$(CC) $(CFLAGS) $(COBJ) $(QOBJ) -o $@
 
+.PHONY: clean
 clean:
-	rm $(UOBJ) $(QOBJ) $(COBJ) $(TARGETS)
+	rm -f $(UOBJ) $(QOBJ) $(COBJ) $(TARGETS)

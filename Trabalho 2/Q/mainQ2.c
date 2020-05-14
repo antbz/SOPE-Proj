@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <errno.h>
 
 #include "inputreader.h"
 #include "place_queue.h"
@@ -25,9 +26,7 @@ int limit_places = 0;
 void* handleRequest(void* arg) {
     pthread_detach(pthread_self());
 
-    // Parses client message into struct
-    struct fifo_msg c_msg;
-    sscanf((char*) arg, "[ %d, %d, %lu, %d, %d ]", &c_msg.i, &c_msg.pid, &c_msg.tid, &c_msg.dur, &c_msg.pl);
+    struct fifo_msg c_msg = *(struct fifo_msg *) arg;
 
     // Reports that message was recieved
     printLog(c_msg.i, c_msg.pid, c_msg.tid, c_msg.dur, c_msg.pl, RECEIVED);
@@ -42,6 +41,7 @@ void* handleRequest(void* arg) {
         printLog(c_msg.i, getpid(), pthread_self(), c_msg.dur, -1, GAVEUP);
 
         if (limit_threads) { sem_post(&nthreads); }
+        free(arg);
         return NULL;
     }
 
@@ -62,9 +62,8 @@ void* handleRequest(void* arg) {
     
 
     // Send client a response through private fifo
-    char response[MAX_MSG];
-    sprintf(response, "[ %d, %d, %ld, %d, %d ]", c_msg.i, getpid(), pthread_self(), c_msg.dur, place);
-    if (write(priv_fd, response, strlen(response)) < 0) {
+    struct fifo_msg response = {c_msg.i, getpid(), pthread_self(), c_msg.dur, place};
+    if (write(priv_fd, &response, sizeof(response)) < 0) {
         // If an error occurs, report that client has given up
         fprintf(stderr, "Cannot write to client %d FIFO!", c_msg.i);
         printLog(c_msg.i, getpid(), pthread_self(), c_msg.dur, -1, GAVEUP);
@@ -77,6 +76,7 @@ void* handleRequest(void* arg) {
             pthread_mutex_unlock(&pl_mut);
             sem_post(&nplaces); 
         }
+        free(arg);
         return NULL;
     }
     
@@ -85,7 +85,7 @@ void* handleRequest(void* arg) {
     // Report that client has entered bathroom
     printLog(c_msg.i, getpid(), pthread_self(), c_msg.dur, place, ENTER);
 
-    usleep(c_msg.dur * 1e3); // Waits for duration of request
+    usleep(c_msg.dur * 1000); // Waits for duration of request
 
     // Report that client has finished using bathroom
     printLog(c_msg.i, getpid(), pthread_self(), c_msg.dur, place, TIMEUP);
@@ -97,38 +97,41 @@ void* handleRequest(void* arg) {
         pthread_mutex_unlock(&pl_mut);
         sem_post(&nplaces); 
     }
+    free(arg);
     return NULL;
 }
 
 void* sendTooLate(void* arg) {
     pthread_detach(pthread_self());
 
-    // Parses client message into struct
-    struct fifo_msg c_msg;
-    sscanf((char*) arg, "[ %d, %d, %lu, %d, %d ]", &c_msg.i, &c_msg.pid, &c_msg.tid, &c_msg.dur, &c_msg.pl);
+    struct fifo_msg c_msg = *(struct fifo_msg *) arg;
+
+    // Reports that message was recieved
+    printLog(c_msg.i, c_msg.pid, c_msg.tid, c_msg.dur, c_msg.pl, RECEIVED);
 
     // Opens private fifo for sending response, waiting for client to open other side
     char fifoname[MAX_FIFONAME];
     sprintf(fifoname, "/tmp/%d.%ld", c_msg.pid, c_msg.tid);
     int priv_fd;
     if ((priv_fd = open(fifoname, O_WRONLY)) < 0) {
-        perror("Cannot open FIFO for WRITING!");
+        fprintf(stderr, "Cannot open %s for WRITING!\n", fifoname);
         printLog(c_msg.i, getpid(), pthread_self(), c_msg.dur, -1, GAVEUP);
         
         if (limit_threads) { sem_post(&nthreads); }
+        free(arg);
         return NULL;
     }
 
     // Send client a response through private fifo
-    char response[MAX_MSG];
-    sprintf(response, "[ %d, %d, %ld, %d, %d ]", c_msg.i, getpid(), pthread_self(), -1, -1);
-    if (write(priv_fd, response, strlen(response)) < 0) {
+    struct fifo_msg response = {c_msg.i, getpid(), pthread_self(), -1, -1};
+    if (write(priv_fd, &response, sizeof(response)) < 0) {
         // If an error occurs, report that client has given up
         fprintf(stderr, "Cannot write to client %d FIFO!", c_msg.i);
         printLog(c_msg.i, getpid(), pthread_self(), c_msg.dur, -1, GAVEUP);
         close(priv_fd);
         
         if (limit_threads) { sem_post(&nthreads); }
+        free(arg);
         return NULL;
     }
 
@@ -138,12 +141,11 @@ void* sendTooLate(void* arg) {
     printLog(c_msg.i, getpid(), pthread_self(), -1, -1, TOOLATE);
 
     if (limit_threads) { sem_post(&nthreads); }
+    free(arg);
     return NULL;
 }
 
 int main(int argc, char* argv[]) {
-    printf("%d\n",getpid());
-    sleep(2);
     setStart();
 
     struct Qarg args = processArgs(argc,argv); // Process console arguments
@@ -153,12 +155,14 @@ int main(int argc, char* argv[]) {
     // Create server public fifo
     if (mkfifo(args.fifoname, 0660) == -1) {
         perror("Error creating Server FIFO");
-        exit(2);
+        if (errno != EEXIST) { // If the FIFO exists, it will try to open it anyways, otherwise, exit
+            exit(2);
+        }
     }
 
     // Open public fifo for reading
     int fifo_fd;
-    if ((fifo_fd = open(args.fifoname, O_RDONLY | O_NONBLOCK)) < 0) {
+    if ((fifo_fd = open(args.fifoname, O_RDONLY)) < 0) {
         perror("Cannot open Server FIFO for reading!");
         if (unlink(args.fifoname) < 0) {
             perror("Cannot delete FIFO");
@@ -175,18 +179,19 @@ int main(int argc, char* argv[]) {
         pq = createPlaceQueue(args.nplaces);
         fillPlaceQueue(&pq);
     }
-    char msg[MAX_MSG];
+    struct fifo_msg msg;
     while (elapsedTime() < args.numberSeconds) {
         // Reads a message from public fifo and if it is a valid one, processes it
-        if (read_msg(fifo_fd, msg, '\n') > 0 && msg[0] == '[') {
+        if (read(fifo_fd, &msg, sizeof(msg)) > 0) {
             // Creates a copy of read message for passing to thread
-            char* cpy;
-            cpy = strdup(msg);
+            struct fifo_msg* cpy = malloc(sizeof(struct fifo_msg));
+            *cpy = msg;
             // Creates thread for processing request
             if (limit_threads) { sem_wait(&nthreads); }
             pthread_t t;
             if (pthread_create(&t, NULL, handleRequest, cpy) != 0) {
                 perror("Thread creation failed");
+                free(cpy);
             }
         }
     }
@@ -197,15 +202,14 @@ int main(int argc, char* argv[]) {
 
     // If after runtime has passed there is a message in the fifo, indicate that it is too late
     // to use the bathroom
-    while (read_msg(fifo_fd, msg, '\n') > 0) {
-        if (msg[0] == '[') {
-            char* cpy;
-            cpy = strdup(msg);
-            if (limit_threads) { sem_wait(&nthreads); }
-            pthread_t t;
-            if (pthread_create(&t, NULL, sendTooLate, cpy) != 0) {
-                perror("Thread creation failed");
-            }
+    while (read(fifo_fd, &msg, sizeof(msg)) > 0) {
+        struct fifo_msg* cpy = malloc(sizeof(struct fifo_msg));
+        *cpy = msg;
+        if (limit_threads) { sem_wait(&nthreads); }
+        pthread_t t;
+        if (pthread_create(&t, NULL, sendTooLate, cpy) != 0) {
+            perror("Thread creation failed");
+            free(cpy);
         }
     }
 
