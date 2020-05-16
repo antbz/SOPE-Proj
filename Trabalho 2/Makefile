@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -pedantic -Wno-unused-parameter -pthread -lpthread
+CFLAGS = -Wall -Wextra -pedantic -Wno-unused-parameter -pthread -lpthread
 UOBJ = U/mainU2.o U/inputreader.o
 QOBJ = Q/mainQ2.o Q/inputreader.o
 COBJ = common/utils.o

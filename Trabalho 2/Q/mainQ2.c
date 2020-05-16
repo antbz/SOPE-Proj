@@ -27,6 +27,7 @@ void* handleRequest(void* arg) {
     pthread_detach(pthread_self());
 
     struct fifo_msg c_msg = *(struct fifo_msg *) arg;
+    free(arg);
 
     // Reports that message was recieved
     printLog(c_msg.i, c_msg.pid, c_msg.tid, c_msg.dur, c_msg.pl, RECEIVED);
@@ -41,7 +42,6 @@ void* handleRequest(void* arg) {
         printLog(c_msg.i, getpid(), pthread_self(), c_msg.dur, -1, GAVEUP);
 
         if (limit_threads) { sem_post(&nthreads); }
-        free(arg);
         return NULL;
     }
 
@@ -76,7 +76,6 @@ void* handleRequest(void* arg) {
             pthread_mutex_unlock(&pl_mut);
             sem_post(&nplaces); 
         }
-        free(arg);
         return NULL;
     }
     
@@ -97,7 +96,6 @@ void* handleRequest(void* arg) {
         pthread_mutex_unlock(&pl_mut);
         sem_post(&nplaces); 
     }
-    free(arg);
     return NULL;
 }
 
@@ -105,6 +103,7 @@ void* sendTooLate(void* arg) {
     pthread_detach(pthread_self());
 
     struct fifo_msg c_msg = *(struct fifo_msg *) arg;
+    free(arg);
 
     // Reports that message was recieved
     printLog(c_msg.i, c_msg.pid, c_msg.tid, c_msg.dur, c_msg.pl, RECEIVED);
@@ -118,7 +117,6 @@ void* sendTooLate(void* arg) {
         printLog(c_msg.i, getpid(), pthread_self(), c_msg.dur, -1, GAVEUP);
         
         if (limit_threads) { sem_post(&nthreads); }
-        free(arg);
         return NULL;
     }
 
@@ -131,7 +129,6 @@ void* sendTooLate(void* arg) {
         close(priv_fd);
         
         if (limit_threads) { sem_post(&nthreads); }
-        free(arg);
         return NULL;
     }
 
@@ -141,7 +138,6 @@ void* sendTooLate(void* arg) {
     printLog(c_msg.i, getpid(), pthread_self(), -1, -1, TOOLATE);
 
     if (limit_threads) { sem_post(&nthreads); }
-    free(arg);
     return NULL;
 }
 
